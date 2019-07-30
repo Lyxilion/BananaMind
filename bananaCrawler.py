@@ -44,7 +44,7 @@ timeScale = [
 # "oh"      height
 
 
-def commandProcesor(input:str) :
+def commandProcesor(input: str):
     """
         the input processor
     :param input: a command input
@@ -54,13 +54,13 @@ def commandProcesor(input:str) :
     """
     dir = "default"
     limit = 500
-    keyworks = False
+    keywords = False
     rep = re.findall(r'(-[khslrn]) ?"([a-zA-Z0-9- ]*)"', input)
 
-    for e in rep :
+    for e in rep:
         if e[0] == "-k":
             if len(e[1]) > 0:
-                keyworks = e[1].split(" ")
+                keywords = e[1].split(" ")
             else:
                 print('Need keywords')
                 exit()
@@ -73,44 +73,44 @@ def commandProcesor(input:str) :
         if e[0] == "-l":
             if len(e[1]) > 0:
                 limit = int(e[1])
-            else :
+            else:
                 print('Need valid limit')
                 exit()
-    if not keyworks :
+    if not keywords:
         print("-k is required")
         exit()
-    return keyworks,dir,limit
+    return keywords, dir, limit
 
 
-def formatRequest(keyworks:list,time:str):
+def formatRequest(keywords: list, time: str):
     """
         Transform a list of keywords in a valid google image search URL
-    :param keyworks: a list of the keyworkdto search
-    :type keyworks: list
+    :param keywords: a list of the keyworkdto search
+    :type keywords: list
     :param time: a valid google get variable of a period of time
     :type time: str
     :return: a valid google image search URL
     :rtype: str
     """
     request = "https://www.google.com/search?tbm=isch&q="
-    for e in keyworks :
-        request+=e+"+"
-    request+= time
+    for e in keywords:
+        request += e+"+"
+    request += time
     return request
 
 
-def findNextLink(page:str):
+def findNextLink(page: str):
     """
         Find in the HTML code the first JSON of an image and loads it.
-    :param rep: the HTML code of the page
-    :type rep: str
+    :param page: the HTML code of the page
+    :type page: str
     :return: JSON of the image / the place of the final char of the JSONin the page
     :rtype: dict / int
     """
     start_line = page.find('class="rg_meta notranslate">')      # the name of the div contening the json code
     if start_line == -1:                                        # check if there is no more links in the code
         print("No more links")
-        return "No more links",None
+        return "No more links", None
     else:
         start_object = page.find('{', start_line + 1)
         end_object = page.find('</div>', start_object + 1)
@@ -119,7 +119,7 @@ def findNextLink(page:str):
         return final_object, end_object
 
 
-def loadJson(s:str):
+def loadJson(s: str):
     """
         Repair and load a JSON tht might be broken by " or ,
     :param s: a JSON string
@@ -127,8 +127,9 @@ def loadJson(s:str):
     :return: a JSON repaired and loaded
     :rtype: dict
     """
-    i=0                                                         # Counter use by the fail safe if it's not reparable
-    while True or i > len(s):                                   # Failsafe : number of check greater than len of the string
+    i = 0                    # Counter use by the fail safe if it's not reparable
+    result = None
+    while True or i > len(s):     # Failsafe : number of check greater than len of the string
         try:
             result = json.loads(s)
             break  # parsing worked -> exit loop
@@ -143,11 +144,11 @@ def loadJson(s:str):
             # position of correspondig closing '"' (+2 for inserted '\')
             closg = s.find(r'"', unesc + 2)
             s = s[:closg] + r'\"' + s[closg + 1:]
-        i+=1
+        i += 1
     return result
 
 
-def formatName(object:dict):
+def formatName(object: dict):
     """
         Check if the filename is available, change it if not
     :param object: a JSON containing the information of the image
@@ -155,20 +156,20 @@ def formatName(object:dict):
     :return: a valid name for the file
     :rtype: str
     """
-    name = "downloads"+ sep + dir + sep + str(object["ow"]) + "x" + str(object["oh"]) + "." + object["ity"]
+    name = "downloads" + sep + dir + sep + str(object["ow"]) + "x" + str(object["oh"]) + "." + object["ity"]
     nameNotOk = True
     number = 2
     while nameNotOk:
         try:
             with open(name):
-                name = "downloads"+ sep + dir + sep + str(object["ow"]) + "x" + str(object["oh"]) + " (" + str(number) + ")." + object["ity"]
+                name = "downloads" + sep + dir + sep + str(object["ow"]) + "x" + str(object["oh"]) + " (" + str(number) + ")." + object["ity"]
                 number += 1
         except IOError:
             nameNotOk = False
     return name
 
 
-def downloadImage(object:dict):
+def downloadImage(object: dict):
     """
         Download a image from a JSON
     :param object: a JSON containing the information of the image
@@ -177,7 +178,7 @@ def downloadImage(object:dict):
     :rtype: bool
     """
     i = 0
-    try :
+    try:
         req = Request(object['ou'])
         response = urlopen(req)
         data = response.read()
@@ -186,31 +187,30 @@ def downloadImage(object:dict):
         output = open(formatName(object), 'wb')
         output.write(data)
         output.close()
-        i+=1
-        #print("L'image : "+object["pt"]+" à été créé.")
+        i += 1
         return True
     except Exception as e:
-        print("an error as occured : "+ str(e))
+        print("an error as occurred : " + str(e))
         return False
         # Error 403
 
 
-def createDir(dir:str):
+def createDir(dir: str):
     """
         Create a directory
     :param dir: name of the directory
     :type dir: str
     :return: 0
     """
-    badChar = ['"', "*" ,"/", ":", "<", ">", "?", "\\", "|" ]
-    for e in badChar :
+    badChar = ['"', "*", "/", ":", "<", ">", "?", "\\", "|"]
+    for e in badChar:
         dir = dir.replace(e, "")
-    try :
-        os.mkdir("downloads"+sep+dir)
+    try:
+        os.mkdir("downloads" + sep + dir)
     except OSError:
         print("Directory already exist")
     else:
-        print("directory "+dir+" was created")
+        print("directory " + dir + " was created")
 
 
 # __MAIN LOOP__ #
@@ -220,15 +220,15 @@ keywords, dir, limit = commandProcesor(command)
 page = ""
 for e in timeScale:
     print("Request...")
-    req = Request(formatRequest(keywords,e),headers = {"User-Agent": "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.27 Safari/537.17"})
+    req = Request(formatRequest(keywords, e), headers={"User-Agent": "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.27 Safari/537.17"})
     page += urlopen(req).read().decode()
     print("Request Success!")
 createDir(dir)
 print("Searching for Links...")
 links = []
-for i in range(limit) :
+for i in range(limit):
     object, end = findNextLink(page)
-    if object=="No more links" :
+    if object == "No more links":
         break
     else:
         links.append(object)
@@ -237,9 +237,9 @@ print(str(len(links))+" links found!")
 
 print("Start Download...")
 count = 0
-for e in links :
-    if downloadImage(e) :
-        count+=1
+for e in links:
+    if downloadImage(e):
+        count += 1
 print("Download finished")
 print(str(count) + "/" + str(len(links)) + " images downloaded")
 
