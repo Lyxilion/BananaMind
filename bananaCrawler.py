@@ -27,8 +27,8 @@ timeScale = [
 
 # Arguments
 # -k : keywords (required), the keywords to search for
-# -l : limit (optional default:100), limit of image to download
-# -n : name (optional default:default), nameof the output directory
+# -l : limit (optional default:500), limit of image to download
+# -n : name (optional default:default), name of the output directory
 # each argument must be follow by value between '"'
 # example : -k "banana -juice" -n "Banana"
 
