@@ -17,14 +17,6 @@ if (not os.environ.get('PYTHONHTTPSVERIFY', '') and
 sep = "\\"   # Windows
 #sep = "/"   # Linux
 
-timeScale = [
-    "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2019%2Ccd_max%3A7%2F30%2F2019",
-    "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2018%2Ccd_max%3A12%2F31%2F2018",
-    "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2017%2Ccd_max%3A12%2F31%2F2017",
-    "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2016%2Ccd_max%3A12%2F31%2F2016",
-    "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2015%2Ccd_max%3A12%2F31%2F2015"
-]
-
 # Arguments
 # -k : keywords (required), the keywords to search for
 # -l : limit (optional default:500), limit of image to download
@@ -42,6 +34,14 @@ timeScale = [
 # "ity"     file format
 # "ow"      width
 # "oh"      height
+
+timeScale = [
+    "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2019%2Ccd_max%3A7%2F30%2F2019",
+    "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2018%2Ccd_max%3A12%2F31%2F2018",
+    "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2017%2Ccd_max%3A12%2F31%2F2017",
+    "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2016%2Ccd_max%3A12%2F31%2F2016",
+    "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2015%2Ccd_max%3A12%2F31%2F2015"
+]
 
 
 def commandProcesor(input: str):
