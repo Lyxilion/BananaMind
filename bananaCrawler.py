@@ -42,6 +42,16 @@ timeScale = [
     "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2016%2Ccd_max%3A12%2F31%2F2016",
     "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2015%2Ccd_max%3A12%2F31%2F2015"
 ]
+"""
+timeScale = []
+days = ["31","28","31","30","31","30","31","31","30","31","30","31"]
+
+for i in range(5):
+    for j in range(12):
+        timeScale.append("&tbs=cdr%3A1%2Ccd_min%3A1%2F"+str(j+5)+"%2F201"+str(i+1)+"%2Ccd_max%3A"+days[j]+"%2F"+str(j+1)+"%2F201"+str(i+5))
+print(timeScale)
+"""
+
 
 def commandProcesor(user_input: str):
     """
@@ -222,7 +232,7 @@ def createDir(dir_path: str):
 
 
 # __MAIN LOOP__ #
-
+print("BananaCrawler 1.0\n-h for help")
 keywords, dir_path, limit = False, False, False
 while not keywords and not dir_path and not limit:
     command = input("$")
@@ -233,9 +243,10 @@ page = ""
 req_limit = int(limit / len(timeScale))
 links = []
 
-for e in timeScale:
-    print("Request...")
-    req = Request(formatRequest(keywords, e), headers={"User-Agent": "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.27 Safari/537.17"})
+for j in range(len(timeScale)):
+    print("-----------------------")
+    print("Request "+str((j+1))+" out of "+str(len(timeScale)))
+    req = Request(formatRequest(keywords, timeScale[j]), headers={"User-Agent": "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.27 Safari/537.17"})
     page += urlopen(req).read().decode()
     print("Request Success!")
     print("Searching for Links...")
@@ -247,12 +258,16 @@ for e in timeScale:
             links.append(img_object)
             page = page[end:]
     print("Done")
-print(str(len(links))+" links found!")
 
+print("-----------------------")
+print(str(len(links))+" links found!")
+print("-----------------------")
 print("Start Download...")
 count = 0
-for e in links:
-    if downloadImage(e):
+for i in range(len(links)):
+    if i % 10 == 0:
+        print(str(i) +" out of "+str(len(links)))
+    if downloadImage(links[i]):
         count += 1
 print("Download finished")
 print(str(count) + "/" + str(len(links)) + " images downloaded")
