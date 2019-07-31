@@ -43,7 +43,6 @@ timeScale = [
     "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2015%2Ccd_max%3A12%2F31%2F2015"
 ]
 
-
 def commandProcesor(user_input: str):
     """
         the input processor
@@ -78,7 +77,7 @@ def commandProcesor(user_input: str):
                 return False, False, False
         if e[0] == "-l":
             if len(e[1]) > 0:
-                if int(e[1]) < 500:
+                if int(e[1]) <= 500:
                     limit = int(e[1])
                 else:
                     print("Impossible number of image (max:500)")
@@ -117,7 +116,7 @@ def findNextLink(page: str):
     :return: JSON of the images / the place of the final char of the JSONin the page
     :rtype: dict / int
     """
-    start_line = page.find('class="rg_meta notranslate">')      # the name of the div contening the json code
+    start_line = page.find('class="rg_meta notranslate">')      # the name of the div containing the json code
     if start_line == -1:                                        # check if there is no more links in the code
         print("No more links")
         return "No more links", None
@@ -125,7 +124,7 @@ def findNextLink(page: str):
         start_object = page.find('{', start_line + 1)
         end_object = page.find('</div>', start_object + 1)
         object_raw = str(page[start_object:end_object])
-        final_object = loadJson(object_raw)                     # use custom fonction to repair and load JSON
+        final_object = loadJson(object_raw)                     # use custom function to repair and load JSON
         return final_object, end_object
 
 
@@ -202,7 +201,6 @@ def downloadImage(img_object: dict):
     except Exception as e:
         print("an error as occurred : " + str(e))
         return False
-        # Error 403
 
 
 def createDir(dir_path: str):

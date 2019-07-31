@@ -4,13 +4,13 @@ import os
 
 while True:         # ask for a path
     path = input("Path :")
-    if os.path.exists(path):        # check if directory exist
+    if os.path.exists(path):        # check if dir_path exist
         break
     else:
         print("Wrong path")
 
 tab = []
-for file in os.listdir(path):       # load every file in the directory
+for file in os.listdir(path):       # load every file in the dir_path
     print(os.path.join(path, file))
     tab.append(os.path.join(path, file))
 
