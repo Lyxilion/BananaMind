@@ -278,9 +278,3 @@ for i in range(len(links)):
         count += 1
 print("Download finished")
 print(str(count) + "/" + str(len(links)) + " images downloaded")
-
-
-# TODO LIST :
-# TODO add related search
-# TODO add search picture(photos) only ? DO NOT WORK ?
-# TODO add EXIF checker ? DO NOT WURK
