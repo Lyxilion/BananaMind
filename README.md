@@ -12,7 +12,7 @@ This is a list of the argument :
 |keywords |k|*required*|Define the keyworkds to search for, you can use '-' to exclude a keyword of the search|
 |limit|l|*500*|The limit of images to search for. This number is divided by the number a search request and rounded up to the closest and lowest integer, so expect a lower number of image returned|
 |name|n|*default*|The name of the output directory, all unallowed character in windows file name will be deleted from it|
-|mode|m|*1*|The mode of request, mode 1 will do 5 search over a periode of 5 years, mode 2 will do 60 search over a periode of 5 years.The only accepeted value are 1 and 2|
+|mode|m|*1*|The mode of request, mode 1 will do 5 search over a periode of 5 years, mode 2 will do 60 search over a periode of 5 years.The only accepeted value are 1 and 2. The mode 2 takes longer, but is *suposed* to be more acurate for the same number of image downloaded|
 
 
 All argument must follow a '-' and be follow by a space and a value between '"'. Only the -k argument is required.
