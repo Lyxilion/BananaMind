@@ -5,7 +5,7 @@ import json
 import re
 import os
 
-# Uncomment line below if SSL error (workaround)
+# Uncomment line below if SSL error (ugly workaround)
 """
 import ssl
 if (not os.environ.get('PYTHONHTTPSVERIFY', '') and
@@ -15,14 +15,16 @@ if (not os.environ.get('PYTHONHTTPSVERIFY', '') and
 
 # the separator use by windows '\' or Linux '/'
 sep = "\\"   # Windows
-#sep = "/"   # Linux
+# sep = "/"  # Linux
 
 # Arguments
+# -h : help
 # -k : keywords (required), the keywords to search for
 # -l : limit (optional default:500), limit of images to download
 # -n : name (optional default:default), name of the output dir_path
+# -m : mode (optional default:1), the mode of the request (1 : 5 request period of 1 year, 2 : 60 request 1 each month for 5 years)
 # each argument must be follow by value between '"'
-# example : -k "banana -juice" -n "Banana"
+# example : -k "banana -juice" -n "Banana" -m "2"
 
 # Google HANDBOOK :
 # utiliser des operateur comme "poulpe -cuisine" pour suprimmer les images non voulue dès la recherche
@@ -35,25 +37,8 @@ sep = "\\"   # Windows
 # "ow"      width
 # "oh"      height
 
-timeScale = [
-    "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2019%2Ccd_max%3A7%2F30%2F2019",
-    "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2018%2Ccd_max%3A12%2F31%2F2018",
-    "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2017%2Ccd_max%3A12%2F31%2F2017",
-    "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2016%2Ccd_max%3A12%2F31%2F2016",
-    "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2015%2Ccd_max%3A12%2F31%2F2015"
-]
-"""
-timeScale = []
-days = ["31","28","31","30","31","30","31","31","30","31","30","31"]
 
-for i in range(5):
-    for j in range(12):
-        timeScale.append("&tbs=cdr%3A1%2Ccd_min%3A1%2F"+str(j+5)+"%2F201"+str(i+1)+"%2Ccd_max%3A"+days[j]+"%2F"+str(j+1)+"%2F201"+str(i+5))
-print(timeScale)
-"""
-
-
-def commandProcesor(user_input: str):
+def commandProcessor(user_input: str):
     """
         the input processor
     :param user_input: a command input
@@ -61,44 +46,69 @@ def commandProcesor(user_input: str):
     :return: the keywords / the name of dir_path / the images' limit
     :rtype: list / str / int
     """
+    time_scale = [
+        "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2019%2Ccd_max%3A7%2F30%2F2019",
+        "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2018%2Ccd_max%3A12%2F31%2F2018",
+        "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2017%2Ccd_max%3A12%2F31%2F2017",
+        "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2016%2Ccd_max%3A12%2F31%2F2016",
+        "&tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2015%2Ccd_max%3A12%2F31%2F2015"
+    ]
     dir_path = "default"
     limit = 500
     keywords = False
-    rep = re.findall(r'(-[kln]) ?"([a-zA-Z0-9- ]*)"', user_input)
+    rep = re.findall(r'(-[klnm]) ?"([a-zA-Z0-9-_ ]*)"', user_input)
     if user_input == "-h" or user_input == "-help":
         print("-k : keywords (required), the keywords to search for.")
-        print("-l : limit (optional default:500), limit of images to download")
-        print("-n : name (optional default:default), name of the output dir_path")
-        print("""each argument must be follow by value between '"'""")
+        print("-l : limit (optional default:500), limit of images to download the actual number is the int(limit/request)*requets, expect lower value")
+        print("-n : name (optional default:default), name of the output directory")
+        print("-m : mode (optional default:1, accepted_values:1, 2), the number of requests (1 : 5 request period of 1 year, 2 : 60 request 1 each month for 5 years)")
+        print("""each argument must be follow by a value between '"'""")
         print("""example : -k "banana -juice" -n "Banana" """)
-        return False, False, False
+        return False, False, False, False
     for e in rep:
         if e[0] == "-k":
             if len(e[1]) > 0:
                 keywords = e[1].split(" ")
             else:
                 print('Need keywords')
-                return False, False, False
+                return False, False, False, False
         if e[0] == "-n":
             if len(e[1]) > 0:
                 dir_path = e[1]
             else:
                 print('Need valid name')
-                return False, False, False
+                return False, False, False, False
         if e[0] == "-l":
             if len(e[1]) > 0:
-                if int(e[1]) <= 500:
-                    limit = int(e[1])
+                if int(e[1]) <= 5000:
+                    try:
+                        limit = int(e[1])
+                    except Exception as e:
+                        print(e)
                 else:
                     print("Impossible number of image (max:500)")
-                    return False, False, False
+                    return False, False, False, False
             else:
                 print('Need valid limit')
-                return False, False, False
+                return False, False, False, False
+        if e[0] == "-m":
+            if len(e[1]) > 0:
+                if e[1] == "1":
+                    pass
+                elif e[1] == "2":
+                    time_scale = []
+                    days = ["31", "28", "31", "30", "31", "30", "31", "31", "30", "31", "30", "31"]
+                    for i in range(5):
+                        for j in range(12):
+                            time_scale.append("&tbs=cdr%3A1%2Ccd_min%3A" + str(j + 1) + "%2F1%2F201" + str(i + 5) + "%2Ccd_max%3A" + str(j + 1) + "%2F" + days[j] + "%2F201" + str(i + 5))
+                    print(time_scale)
+                else:
+                    print("Not a valid mode, use 1 or 2")
+                    return False, False, False, False
     if not keywords:
         print("-k is required")
-        return False, False, False
-    return keywords, dir_path, limit
+        return False, False, False, False
+    return keywords, dir_path, limit, time_scale
 
 
 def formatRequest(keywords: list, time: str):
@@ -114,8 +124,7 @@ def formatRequest(keywords: list, time: str):
     request = "https://www.google.com/search?tbm=isch&q="
     for e in keywords:
         request += e+"+"
-    request += time
-    return request
+    return request[:-1] + time
 
 
 def findNextLink(page: str):
@@ -233,21 +242,20 @@ def createDir(dir_path: str):
 
 # __MAIN LOOP__ #
 print("BananaCrawler 1.0\n-h for help")
-keywords, dir_path, limit = False, False, False
-while not keywords and not dir_path and not limit:
+keywords, dir_path, limit, time_scale = False, False, False, False
+while not keywords:
     command = input("$")
-    keywords, dir_path, limit = commandProcesor(command)
+    keywords, dir_path, limit, time_scale = commandProcessor(command)
 
 createDir(dir_path)
 page = ""
-req_limit = int(limit / len(timeScale))
+req_limit = int(limit / len(time_scale))
 links = []
-
-for j in range(len(timeScale)):
-    print("-----------------------")
-    print("Request "+str((j+1))+" out of "+str(len(timeScale)))
-    req = Request(formatRequest(keywords, timeScale[j]), headers={"User-Agent": "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.27 Safari/537.17"})
-    page += urlopen(req).read().decode()
+for j in range(len(time_scale)):
+    print("----------------------")
+    print("Request "+str((j+1))+" out of "+str(len(time_scale)))
+    req = Request(formatRequest(keywords, time_scale[j]), headers={"User-Agent": "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.27 Safari/537.17"})
+    page = urlopen(req).read().decode()
     print("Request Success!")
     print("Searching for Links...")
     for i in range(req_limit):
@@ -258,15 +266,14 @@ for j in range(len(timeScale)):
             links.append(img_object)
             page = page[end:]
     print("Done")
-
-print("-----------------------")
+print("----------------------")
 print(str(len(links))+" links found!")
-print("-----------------------")
+print("----------------------")
 print("Start Download...")
 count = 0
 for i in range(len(links)):
     if i % 10 == 0:
-        print(str(i) +" out of "+str(len(links)))
+        print(str(i) + " out of " + str(len(links)))
     if downloadImage(links[i]):
         count += 1
 print("Download finished")
@@ -275,5 +282,5 @@ print(str(count) + "/" + str(len(links)) + " images downloaded")
 
 # TODO LIST :
 # TODO add related search
-# TODO add search picture(photos) only ?
-# TODO add EXIF checker ?
+# TODO add search picture(photos) only ? DO NOT WORK ?
+# TODO add EXIF checker ? DO NOT WURK

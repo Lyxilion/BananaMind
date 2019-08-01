@@ -9,10 +9,14 @@ while True:         # ask for a path
     else:
         print("Wrong path")
 
-tab = []
+tab_temp = []
 for file in os.listdir(path):       # load every file in the dir_path
     print(os.path.join(path, file))
-    tab.append(os.path.join(path, file))
+    tab_temp.append(os.path.join(path, file))
+tab=[]
+for e in tab_temp:
+    if e[len(e)-4:] == ".jpg" or e[len(e)-4:] == ".png" :
+        tab.append(e)
 
 root = tk.Tk()
 root.title("BananaViewer")
@@ -40,6 +44,7 @@ def delete(event=None):
     else:
         os.remove(tab[0])
         tab.pop(0)
+        print("Restant : " + str(len(tab)))
         root.photo = ImageTk.PhotoImage(Image.open(tab[0]).resize((pic_width, pic_height), Image.ANTIALIAS))
         vlabel.configure(image=root.photo)
         print("deleted")
@@ -55,7 +60,7 @@ def change_pic(event=None):
         exit()
     else:
         tab.pop(0)
-        print("Test")
+        print("Restant : " + str(len(tab)))
         root.photo = ImageTk.PhotoImage(Image.open(tab[0]).resize((pic_width, pic_height), Image.ANTIALIAS))
         vlabel.configure(image=root.photo)
         print("kept")
