@@ -43,7 +43,7 @@ Use the button or the Left and Right arrows to keep a file or delete it.
 
 File deleted by the viewer can't be recovered.
 
-Images are resized to fit the windows size.
+Images are resized to fit the window size.
 
-Only suported format are .png and .jpeg.
+Only suported formats are .png and .jpeg.
 
